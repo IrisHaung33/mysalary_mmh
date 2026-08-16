@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>薪津發放明細彙整 (102.09 - 105.03)</title>
+  <style>
+    :root {
+      --primary-color: #1e3a8a;
+      --secondary-color: #3b82f6;
+      --accent-color: #d97706;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --row-hover: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header & Basic Info Card */
+    .profile-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      border: 1px solid var(--border-color);
+    }
+
+    .profile-card h1 {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .info-item {
+      background: var(--bg-color);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border-left: 4px solid var(--secondary-color);
+    }
+
+    .info-item .label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .info-item .value {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Table Component */
+    .table-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .table-card h2 {
+      font-size: 1.25rem;
+      color: var(--primary-color);
+      margin-bottom: 16px;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: var(--primary-color);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    tbody tr:hover {
+      background-color: var(--row-hover);
+    }
+
+    .amount {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .net-amount {
+      font-weight: 700;
+      color: var(--accent-color);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      background-color: #e0f2fe;
+      color: #0369a1;
+      margin-right: 4px;
+      margin-bottom: 2px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+      .profile-card, .table-card {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 個人基本資料 -->
+    <div class="profile-card">
+      <h1>個人薪資資料查詢</h1>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="label">姓名</div>
+          <div class="value">黃O萱[span_0](start_span)[span_0](end_span)</div>
+        </div>
+        <div class="info-item">
+          <div class="label">服務單位</div>
+          <div class="value">腫瘤內科(52病房)(淡水) ➔ MICU(B)(淡水)[span_1](start_span)[span_1](end_span)</div>
+        </div>
+        <div class="info-item">
+          <div class="label">職等 / 職級</div>
+          <div class="value">5職等 3級 ➔ 10級[span_2](start_span)[span_2](end_span)</div>
+        </div>
+        <div class="info-item">
+          <div class="label">資料區間</div>
+          <div class="value">102年9月 ～ 105年3月</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 薪津發放明細彙整 -->
+    <div class="table-card">
+      <h2>薪津發放明細表</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>查詢年月</th>
+              <th class="amount">總點數</th>
+              <th class="amount">應領合計</th>
+              <th class="amount">應扣合計</th>
+              <th class="amount">實領淨額</th>
+              <th>重要加給 / 特殊發放項目</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>10209</strong></td>
+              <td class="amount">438[span_3](start_span)[span_3](end_span)</td>
+              <td class="amount">$60,770[span_4](start_span)[span_4](end_span)</td>
+              <td class="amount">$1,581[span_5](start_span)[span_5](end_span)</td>
+              <td class="amount net-amount">$59,189[span_6](start_span)[span_6](end_span)</td>
+              <td>夜班津貼 $10,400、中秋禮金 $3,000、跨科支援獎勵金 $2,000[span_7](start_span)[span_7](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10210</strong></td>
+              <td class="amount">413[span_8](start_span)[span_8](end_span)</td>
+              <td class="amount">$43,378[span_9](start_span)[span_9](end_span)</td>
+              <td class="amount">$1,581[span_10](start_span)[span_10](end_span)</td>
+              <td class="amount net-amount">$41,797[span_11](start_span)[span_11](end_span)</td>
+              <td>調單位補差額薪資 $454[span_12](start_span)[span_12](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10211</strong></td>
+              <td class="amount">413[span_13](start_span)[span_13](end_span)</td>
+              <td class="amount">$46,860[span_14](start_span)[span_14](end_span)</td>
+              <td class="amount">$1,581[span_15](start_span)[span_15](end_span)</td>
+              <td class="amount net-amount">$45,279[span_16](start_span)[span_16](end_span)</td>
+              <td>夜班津貼 $2,000、福利金 $2,800[span_17](start_span)[span_17](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10212</strong></td>
+              <td class="amount">413[span_18](start_span)[span_18](end_span)</td>
+              <td class="amount">$51,869[span_19](start_span)[span_19](end_span)</td>
+              <td class="amount">$1,581[span_20](start_span)[span_20](end_span)</td>
+              <td class="amount net-amount">$50,288[span_21](start_span)[span_21](end_span)</td>
+              <td>聖誕禮金 $3,000、特定專業獎金 $6,000[span_22](start_span)[span_22](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10301</strong></td>
+              <td class="amount">458[span_23](start_span)[span_23](end_span)</td>
+              <td class="amount">$130,425[span_24](start_span)[span_24](end_span)</td>
+              <td class="amount">$5,252[span_25](start_span)[span_25](end_span)</td>
+              <td class="amount net-amount">$125,173[span_26](start_span)[span_26](end_span)</td>
+              <td>年終 $40,957、春節特別獎金 $15,000、職員獎金 $10,000[span_27](start_span)[span_27](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10302</strong></td>
+              <td class="amount">458[span_28](start_span)[span_28](end_span)</td>
+              <td class="amount">$58,686[span_29](start_span)[span_29](end_span)</td>
+              <td class="amount">$1,625[span_30](start_span)[span_30](end_span)</td>
+              <td class="amount net-amount">$57,061[span_31](start_span)[span_31](end_span)</td>
+              <td>夜班津貼 $11,200[span_32](start_span)[span_32](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10303</strong></td>
+              <td class="amount">458[span_33](start_span)[span_33](end_span)</td>
+              <td class="amount">$60,697[span_34](start_span)[span_34](end_span)</td>
+              <td class="amount">$1,589[span_35](start_span)[span_35](end_span)</td>
+              <td class="amount net-amount">$59,108[span_36](start_span)[span_36](end_span)</td>
+              <td>加值班費 $7,311、夜班津貼 $5,900[span_37](start_span)[span_37](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10304</strong></td>
+              <td class="amount">458[span_38](start_span)[span_38](end_span)</td>
+              <td class="amount">$46,699[span_39](start_span)[span_39](end_span)</td>
+              <td class="amount">$1,589[span_40](start_span)[span_40](end_span)</td>
+              <td class="amount net-amount">$45,110[span_41](start_span)[span_41](end_span)</td>
+              <td>常規薪給與績效獎金[span_42](start_span)[span_42](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10305</strong></td>
+              <td class="amount">458[span_43](start_span)[span_43](end_span)</td>
+              <td class="amount">$56,286[span_44](start_span)[span_44](end_span)</td>
+              <td class="amount">$1,589[span_45](start_span)[span_45](end_span)</td>
+              <td class="amount net-amount">$54,697[span_46](start_span)[span_46](end_span)</td>
+              <td>端午禮金 $3,000、福利金 $2,200[span_47](start_span)[span_47](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10306</strong></td>
+              <td class="amount">458[span_48](start_span)[span_48](end_span)</td>
+              <td class="amount">$70,686[span_49](start_span)[span_49](end_span)</td>
+              <td class="amount">$1,589[span_50](start_span)[span_50](end_span)</td>
+              <td class="amount net-amount">$69,097[span_51](start_span)[span_51](end_span)</td>
+              <td>夜班津貼 $17,200、特定專業獎金 $6,000[span_52](start_span)[span_52](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10307</strong></td>
+              <td class="amount">468[span_53](start_span)[span_53](end_span)</td>
+              <td class="amount">$72,570[span_54](start_span)[span_54](end_span)</td>
+              <td class="amount">$1,589[span_55](start_span)[span_55](end_span)</td>
+              <td class="amount net-amount">$70,981[span_56](start_span)[span_56](end_span)</td>
+              <td>夜班津貼 $17,250、考核獎金 $5,640[span_57](start_span)[span_57](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10308</strong></td>
+              <td class="amount">468[span_58](start_span)[span_58](end_span)</td>
+              <td class="amount">$77,170[span_59](start_span)[span_59](end_span)</td>
+              <td class="amount">$1,589[span_60](start_span)[span_60](end_span)</td>
+              <td class="amount net-amount">$75,581[span_61](start_span)[span_61](end_span)</td>
+              <td>超額績效 $14,127、中秋禮金 $3,000[span_62](start_span)[span_62](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10309</strong></td>
+              <td class="amount">468[span_63](start_span)[span_63](end_span)</td>
+              <td class="amount">$63,112[span_64](start_span)[span_64](end_span)</td>
+              <td class="amount">$1,784[span_65](start_span)[span_65](end_span)</td>
+              <td class="amount net-amount">$61,328[span_66](start_span)[span_66](end_span)</td>
+              <td>夜班津貼 $14,600[span_67](start_span)[span_67](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10310</strong></td>
+              <td class="amount">468[span_68](start_span)[span_68](end_span)</td>
+              <td class="amount">$50,512[span_69](start_span)[span_69](end_span)</td>
+              <td class="amount">$1,784[span_70](start_span)[span_70](end_span)</td>
+              <td class="amount net-amount">$48,728[span_71](start_span)[span_71](end_span)</td>
+              <td>夜班津貼 $2,000[span_72](start_span)[span_72](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10311</strong></td>
+              <td class="amount">468[span_73](start_span)[span_73](end_span)</td>
+              <td class="amount">$53,912[span_74](start_span)[span_74](end_span)</td>
+              <td class="amount">$1,784[span_75](start_span)[span_75](end_span)</td>
+              <td class="amount net-amount">$52,128[span_76](start_span)[span_76](end_span)</td>
+              <td>福利金 $3,000[span_77](start_span)[span_77](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10312</strong></td>
+              <td class="amount">468[span_78](start_span)[span_78](end_span)</td>
+              <td class="amount">$96,908[span_79](start_span)[span_79](end_span)</td>
+              <td class="amount">$1,784[span_80](start_span)[span_80](end_span)</td>
+              <td class="amount net-amount">$95,124[span_81](start_span)[span_81](end_span)</td>
+              <td>特別獎勵金 $20,000、超額績效 $9,196、特定專業獎金 $6,000[span_82](start_span)[span_82](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10401</strong></td>
+              <td class="amount">468[span_83](start_span)[span_83](end_span)</td>
+              <td class="amount">$142,724[span_84](start_span)[span_84](end_span)</td>
+              <td class="amount">$6,028[span_85](start_span)[span_85](end_span)</td>
+              <td class="amount net-amount">$136,696[span_86](start_span)[span_86](end_span)</td>
+              <td>年終 $48,012、春節特別獎金 $23,000、職員獎金 $12,000[span_87](start_span)[span_87](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10402</strong></td>
+              <td class="amount">468[span_88](start_span)[span_88](end_span)</td>
+              <td class="amount">$61,712[span_89](start_span)[span_89](end_span)</td>
+              <td class="amount">$1,828[span_90](start_span)[span_90](end_span)</td>
+              <td class="amount net-amount">$59,884[span_91](start_span)[span_91](end_span)</td>
+              <td>夜班津貼 $12,000、春節出勤紅包 $1,200[span_92](start_span)[span_92](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10403</strong></td>
+              <td class="amount">468[span_93](start_span)[span_93](end_span)</td>
+              <td class="amount">$57,611[span_94](start_span)[span_94](end_span)</td>
+              <td class="amount">$1,739[span_95](start_span)[span_95](end_span)</td>
+              <td class="amount net-amount">$55,872[span_96](start_span)[span_96](end_span)</td>
+              <td>加值班費 $3,699、夜班津貼 $5,400[span_97](start_span)[span_97](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10404</strong></td>
+              <td class="amount">468[span_98](start_span)[span_98](end_span)</td>
+              <td class="amount">$62,782[span_99](start_span)[span_99](end_span)</td>
+              <td class="amount">$1,739[span_100](start_span)[span_100](end_span)</td>
+              <td class="amount net-amount">$61,043[span_101](start_span)[span_101](end_span)</td>
+              <td>超額績效 $5,270、夜班津貼 $9,000[span_102](start_span)[span_102](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10405</strong></td>
+              <td class="amount">468[span_103](start_span)[span_103](end_span)</td>
+              <td class="amount">$56,969[span_104](start_span)[span_104](end_span)</td>
+              <td class="amount">$1,739[span_105](start_span)[span_105](end_span)</td>
+              <td class="amount net-amount">$55,230[span_106](start_span)[span_106](end_span)</td>
+              <td>福利金 $2,300、夜班津貼 $4,400[span_107](start_span)[span_107](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10406</strong></td>
+              <td class="amount">468[span_108](start_span)[span_108](end_span)</td>
+              <td class="amount">$70,284[span_109](start_span)[span_109](end_span)</td>
+              <td class="amount">$1,739[span_110](start_span)[span_110](end_span)</td>
+              <td class="amount net-amount">$68,545[span_111](start_span)[span_111](end_span)</td>
+              <td>夜班津貼 $12,000、端午禮金 $3,000、特定專業獎金 $6,000[span_112](start_span)[span_112](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10407</strong></td>
+              <td class="amount">478[span_113](start_span)[span_113](end_span)</td>
+              <td class="amount">$72,116[span_114](start_span)[span_114](end_span)</td>
+              <td class="amount">$1,739[span_115](start_span)[span_115](end_span)</td>
+              <td class="amount net-amount">$70,377[span_116](start_span)[span_116](end_span)</td>
+              <td>夜班津貼 $11,100、考核獎金 $5,640、重大事蹟獎金 $3,000[span_117](start_span)[span_117](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10408</strong></td>
+              <td class="amount">478[span_118](start_span)[span_118](end_span)</td>
+              <td class="amount">$63,479[span_119](start_span)[span_119](end_span)</td>
+              <td class="amount">$1,739[span_120](start_span)[span_120](end_span)</td>
+              <td class="amount net-amount">$61,740[span_121](start_span)[span_121](end_span)</td>
+              <td>夜班津貼 $13,600[span_122](start_span)[span_122](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10409</strong></td>
+              <td class="amount">478[span_123](start_span)[span_123](end_span)</td>
+              <td class="amount">$65,321[span_124](start_span)[span_124](end_span)</td>
+              <td class="amount">$1,784[span_125](start_span)[span_125](end_span)</td>
+              <td class="amount net-amount">$63,537[span_126](start_span)[span_126](end_span)</td>
+              <td>超額績效 $9,583、中秋禮金 $3,000[span_127](start_span)[span_127](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10410</strong></td>
+              <td class="amount">478[span_128](start_span)[span_128](end_span)</td>
+              <td class="amount">$56,738[span_129](start_span)[span_129](end_span)</td>
+              <td class="amount">$1,784[span_130](start_span)[span_130](end_span)</td>
+              <td class="amount net-amount">$54,954[span_131](start_span)[span_131](end_span)</td>
+              <td>夜班津貼 $6,800、颱風交通補助 $400[span_132](start_span)[span_132](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10411</strong></td>
+              <td class="amount">478[span_133](start_span)[span_133](end_span)</td>
+              <td class="amount">$62,589[span_134](start_span)[span_134](end_span)</td>
+              <td class="amount">$1,784[span_135](start_span)[span_135](end_span)</td>
+              <td class="amount net-amount">$60,805[span_136](start_span)[span_136](end_span)</td>
+              <td>夜班津貼 $9,938、福利金 $2,800[span_137](start_span)[span_137](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10412</strong></td>
+              <td class="amount">478[span_138](start_span)[span_138](end_span)</td>
+              <td class="amount">$112,102[span_139](start_span)[span_139](end_span)</td>
+              <td class="amount">$1,784[span_140](start_span)[span_140](end_span)</td>
+              <td class="amount net-amount">$110,318[span_141](start_span)[span_141](end_span)</td>
+              <td>特別獎勵金 $20,000、超額績效 $8,954、加項其他 $9,880[span_142](start_span)[span_142](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10501</strong></td>
+              <td class="amount">478[span_143](start_span)[span_143](end_span)</td>
+              <td class="amount">$140,197[span_144](start_span)[span_144](end_span)</td>
+              <td class="amount">$5,604[span_145](start_span)[span_145](end_span)</td>
+              <td class="amount net-amount">$134,593[span_146](start_span)[span_146](end_span)</td>
+              <td>年終 $49,038、春節特別獎金 $15,000、職員獎金 $11,000[span_147](start_span)[span_147](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10502</strong></td>
+              <td class="amount">478[span_148](start_span)[span_148](end_span)</td>
+              <td class="amount">$71,247[span_149](start_span)[span_149](end_span)</td>
+              <td class="amount">$1,743[span_150](start_span)[span_150](end_span)</td>
+              <td class="amount net-amount">$69,504[span_151](start_span)[span_151](end_span)</td>
+              <td>夜班津貼 $16,000、特別獎勵金P $4,042[span_152](start_span)[span_152](end_span)</td>
+            </tr>
+            <tr>
+              <td><strong>10503</strong></td>
+              <td class="amount">478[span_153](start_span)[span_153](end_span)</td>
+              <td class="amount">$63,923[span_154](start_span)[span_154](end_span)</td>
+              <td class="amount">$1,786[span_155](start_span)[span_155](end_span)</td>
+              <td class="amount net-amount">$62,137[span_156](start_span)[span_156](end_span)</td>
+              <td>加值班費 $7,785、夜班津貼 $6,600[span_157](start_span)[span_157](end_span)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
