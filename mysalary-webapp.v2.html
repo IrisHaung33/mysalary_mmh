@@ -413,6 +413,26 @@ font-size: 13px;
 </head>
 
 <body>
+
+<script>
+window.addEventListener("error", function (event) {
+alert(
+"程式發生錯誤：\n\n" +
+event.message +
+"\n\n第 " +
+event.lineno +
+" 行"
+);
+});
+
+window.addEventListener("unhandledrejection", function (event) {
+alert(
+"非同步程式錯誤：\n\n" +
+String(event.reason)
+);
+});
+</script>
+
 <div class="app">
 <header class="app-header">
 <h1>薪資紀錄</h1>
