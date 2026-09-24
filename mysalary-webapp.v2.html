@@ -1433,3 +1433,95 @@ createItemRow("income");
 document.querySelector("#addDeductionButton")
 .addEventListener("click", () => {
 createItemRow("deduction");
+/* 儲存與表單操作 */
+document.querySelector("#saveButton")
+.addEventListener("click", saveCurrentRecord);
+
+document.querySelector("#resetFormButton")
+.addEventListener("click", () => {
+resetForm();
+});
+
+/* JSON 備份與還原 */
+document.querySelector("#exportJsonButton")
+.addEventListener("click", exportJson);
+
+document.querySelector("#exportCsvButton")
+.addEventListener("click", exportCsv);
+
+jsonFile.addEventListener("change", event => {
+const file = event.target.files[0];
+
+if (!file) {
+return;
+}
+
+const reader = new FileReader();
+
+reader.onload = event => {
+try {
+const data = JSON.parse(event.target.result);
+
+const importedRecords = Array.isArray(data)
+? data
+: data.records;
+
+if (!Array.isArray(importedRecords)) {
+throw new Error("JSON 格式錯誤");
+}
+
+records = importedRecords;
+saveRecords();
+renderHome();
+renderRecords();
+
+alert(
+`已還原 ${records.length} 筆薪資紀錄。`
+);
+} catch (error) {
+alert(
+"JSON 匯入失敗，請確認檔案是本 App 匯出的備份檔。"
+);
+}
+};
+
+reader.onerror = () => {
+alert("JSON 檔案讀取失敗。");
+};
+
+reader.readAsText(file, "UTF-8");
+});
+
+/* 清除全部資料 */
+document.querySelector("#clearAllButton")
+.addEventListener("click", () => {
+if (!records.length) {
+alert("目前沒有可清除的資料。");
+return;
+}
+
+const confirmed = confirm(
+"確定要清除所有薪資紀錄嗎？此操作無法復原。"
+);
+
+if (!confirmed) {
+return;
+}
+
+records = [];
+saveRecords();
+renderHome();
+renderRecords();
+resetForm();
+
+alert("所有資料已清除。");
+});
+
+/* 初始畫面 */
+resetForm();
+renderHome();
+renderRecords();
+showPage("homePage");
+</script>
+</body>
+</html>
