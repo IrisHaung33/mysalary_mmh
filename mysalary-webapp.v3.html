@@ -1021,29 +1021,40 @@ updateTotals();
 }
 
 function showPage(pageId) {
-document.querySelectorAll(".page")
-.forEach(page => {
-page.classList.toggle(
-"active",
-page.id === pageId
-);
+const pages = document.querySelectorAll(".page");
+
+pages.forEach(page => {
+page.classList.remove("active");
 });
 
-document.querySelectorAll(".bottom-nav button")
-.forEach(button => {
+const targetPage = document.getElementById(pageId);
+
+if (targetPage) {
+targetPage.classList.add("active");
+}
+
+document.querySelectorAll(".bottom-nav button").forEach(button => {
 button.classList.toggle(
 "active",
 button.dataset.page === pageId
 );
 });
 
-pageSubtitle.textContent =
-pageTitles[pageId] ||  "";
+const pageTitle = document.querySelector("#pageTitle");
 
-window.scrollTo({
-top: 0,
-behavior: "smooth"
-});
+const pageTitles = {
+homePage: "查看薪資統計與最近紀錄",
+importPage: "匯入並解析薪資文字",
+editPage: "修改薪資項目與金額",
+recordsPage: "查看所有歷史薪資",
+statisticsPage: "查看全年與歷年薪資統計",
+settingsPage: "備份與管理資料"
+};
+
+if (pageTitle) {
+pageTitle.textContent =
+pageTitles[pageId] | | "薪資管理";
+}
 
 if (pageId === "homePage") {
 renderHome();
@@ -1052,10 +1063,10 @@ renderHome();
 if (pageId === "recordsPage") {
 renderRecords();
 }
-}
 
 if (pageId === "statisticsPage") {
 renderStatistics();
+}
 }
 
 function showParsedItems(items) {
