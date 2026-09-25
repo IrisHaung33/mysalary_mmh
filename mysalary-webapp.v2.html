@@ -748,6 +748,7 @@ homePage: "查看薪資統計與最近紀錄",
 importPage: "匯入並解析薪資文字",
 editPage: "修改薪資項目與金額",
 recordsPage: "查看所有歷史薪資",
+statisticsPage: "查看全年與歷年薪資統計",
 settingsPage: "備份與管理資料"
 };
 
@@ -766,6 +767,26 @@ const salaryNote = document.querySelector("#salaryNote");
 const incomeTotal = document.querySelector("#incomeTotal");
 const deductionTotal = document.querySelector("#deductionTotal");
 const netTotal = document.querySelector("#netTotal");
+
+const statisticsYear =
+document.querySelector("#statisticsYear");
+
+const statisticsType =
+document.querySelector("#statisticsType");
+
+const statisticsIncome =
+document.querySelector("#statisticsIncome");
+
+const statisticsDeduction =
+document.querySelector("#statisticsDeduction");
+
+const statisticsNet =
+document.querySelector("#statisticsNet");
+
+const salaryChartCanvas =
+document.querySelector("#salaryChart");
+
+let salaryChart = null;
 
 function loadRecords() {
 try {
@@ -1243,6 +1264,8 @@ deleteRecord(button.dataset.id);
 });
 });
 }
+
+
 
 function editRecord(id) {
 const record = records.find(item => item.id === id);
