@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+<head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -182,11 +184,14 @@ border-radius: 12px;
 background: #eff6ff;
 }
 
-:root[data-theme="dark"] .summary,
+:root[data-theme="dark"] .summary {
+background: #1e3a5f;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .summary {
-    background: #1e3a5f;
-  }
+:root:not([data-theme="light"]) .summary {
+background: #1e3a5f;
+}
 }
 
 .summary.income {
@@ -834,7 +839,17 @@ if (!Array.isArray(data)) {
 return [];
 }
 
-return data;
+return data.map(record => ({
+...record,
+
+incomeItems: Array.isArray(record.incomeItems)
+? record.incomeItems
+: [],
+
+deductionItems: Array.isArray(record.deductionItems)
+? record.deductionItems
+: []
+}));
 } catch (error) {
 return [];
 }
@@ -859,6 +874,40 @@ style: "currency",
 currency: "TWD",
 maximumFractionDigits: 0
 }).format(number);
+}
+
+function toROCYear(year) {
+const number = Number(year);
+
+if (!Number.isFinite(number)) {
+return year;
+}
+
+return number - 1911;
+}
+
+function formatROCDate(dateString) {
+const match = String(dateString | | "").match(
+/^(\d{4})-(\d{2})-(\d{2})$/
+);
+
+if (!match) {
+return dateString | | "";
+}
+
+const [, year, month, day] = match;
+
+return `民國 \({toROCYear(year)} 年 \){Number(month)} 月 ${Number(day)} 日`;
+}
+
+function formatROCYear(year) {
+const text = String(year | | "");
+
+if (!/^\d{4}$/.test(text)) {
+return text;
+}
+
+return `民國 ${toROCYear(text)} 年`;
 }
 
 function escapeHtml(value) {
@@ -1208,7 +1257,7 @@ container.innerHTML = recent.map(record => `
 <div class="record-card">
 <div class="record-top">
 <div class="record-date">
-${escapeHtml(record.date)}
+${escapeHtml(formatROCDate(record.date))}
 </div>
 
 <div class="record-net">
@@ -1251,7 +1300,7 @@ container.innerHTML = getSortedRecords()
 <div class="record-card">
 <div class="record-top">
 <div class="record-date">
-${escapeHtml(record.date)}
+${escapeHtml(formatROCDate(record.date))}
 </div>
 
 <div class="record-net">
@@ -1323,15 +1372,17 @@ records
 statisticsYear.innerHTML = `
 <option value="all">全部年份</option>
 ${years.map(year => `
-<option value="${year}">${year} 年</option>
+<option value="${year}">
+${escapeHtml(formatROCYear(year))}
+</option>
 `).join("")}
 `;
 
 if (
-currentValue === "all" ||
+currentValue === "all" | |
 years.includes(currentValue)
 ) {
-statisticsYear.value = currentValue || "all";
+statisticsYear.value = currentValue | | "all";
 } else {
 statisticsYear.value = "all";
 }
@@ -1636,9 +1687,17 @@ const rows = [[
 ]];
 
 records.forEach(record => {
-record.incomeItems.forEach(item => {
+const incomeList = Array.isArray(record.incomeItems)
+? record.incomeItems
+: [];
+
+const deductionList = Array.isArray(record.deductionItems)
+? record.deductionItems
+: [];
+
+incomeList.forEach(item => {
 rows.push([
-record.date,
+formatROCDate(record.date),
 "收入",
 item.name,
 item.amount,
@@ -1647,9 +1706,9 @@ record.note
 ]);
 });
 
-record.deductionItems.forEach(item => {
+deductionList.forEach(item => {
 rows.push([
-record.date,
+formatROCDate(record.date),
 "扣款",
 item.name,
 -item.amount,
@@ -1791,7 +1850,18 @@ if (!Array.isArray(importedRecords)) {
 throw new Error("JSON 格式錯誤");
 }
 
-records = importedRecords;
+records = importedRecords.map(record => ({
+...record,
+
+incomeItems: Array.isArray(record.incomeItems)
+? record.incomeItems
+: [],
+
+deductionItems: Array.isArray(record.deductionItems)
+? record.deductionItems
+: []
+}));
+
 saveRecords();
 renderHome();
 renderRecords();
