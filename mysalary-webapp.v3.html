@@ -973,7 +973,7 @@ row.querySelector(".item-amount").value
 note: row.querySelector(".item-note")
 .value.trim()
 }))
-.filter(item => item.name | | item.amount);
+.filter(item => item.name || item.amount);
 }
 
 function updateTotals() {
@@ -1038,7 +1038,7 @@ button.dataset.page === pageId
 });
 
 pageSubtitle.textContent =
-pageTitles[pageId] | | "";
+pageTitles[pageId] ||  "";
 
 window.scrollTo({
 top: 0,
@@ -1133,13 +1133,13 @@ String(b.date).localeCompare(String(a.date))
 
 function renderHome() {
 const totalIncome = records.reduce(
-(sum, record) => sum + Number(record.incomeTotal | | 0),
+(sum, record) => sum + Number(record.incomeTotal || 0),
 0
 );
 
 const totalDeduction = records.reduce(
 (sum, record) =>
-sum + Number(record.deductionTotal | | 0),
+sum + Number(record.deductionTotal ||  0),
 0
 );
 
@@ -1188,7 +1188,7 @@ ${money(record.netTotal)}
 </span>
 
 <span>
-${escapeHtml(record.note | | "")}
+${escapeHtml(record.note || "")}
 </span>
 </div>
 </div>
@@ -1231,7 +1231,7 @@ ${money(record.netTotal)}
 </span>
 
 <span>
-${escapeHtml(record.note | | "")}
+${escapeHtml(record.note ||  "")}
 </span>
 </div>
 
@@ -1270,7 +1270,7 @@ deleteRecord(button.dataset.id);
 }
 
 function getRecordYear(record) {
-return String(record.date | | "").slice(0, 4);
+return String(record.date || "").slice(0, 4);
 }
 
 function fillStatisticsYears() {
@@ -1293,7 +1293,7 @@ if (
 currentValue === "all" | |
 years.includes(currentValue)
 ) {
-statisticsYear.value = currentValue | | "all";
+statisticsYear.value = currentValue ||  "all";
 } else {
 statisticsYear.value = "all";
 }
@@ -1324,16 +1324,16 @@ month: index + 1
 
 getStatisticsRecords().forEach(record => {
 const month = Number(
-String(record.date | | "").slice(5, 7)
+String(record.date || "").slice(5, 7)
 );
 
-if (month < 1 | | month > 12) {
+if (month < 1 || month > 12) {
 return;
 }
 
 const index = month - 1;
-const income = Number(record.incomeTotal) | | 0;
-const deduction = Number(record.deductionTotal) | | 0;
+const income = Number(record.incomeTotal) || 0;
+const deduction = Number(record.deductionTotal) || 0;
 
 monthlyData[index].income += income;
 monthlyData[index].deduction += deduction;
@@ -1344,7 +1344,7 @@ return monthlyData;
 }
 
 function renderStatistics() {
-if (!statisticsYear | | !salaryChartCanvas) {
+if (!statisticsYear || !salaryChartCanvas) {
 return;
 }
 
@@ -1373,7 +1373,7 @@ salaryChart.destroy();
 }
 
 salaryChart = new Chart(salaryChartCanvas, {
-type: statisticsType.value | | "line",
+type: statisticsType.value || "line",
 data: {
 labels: monthlyData.map(item => `${item.month} 月`),
 datasets: [
@@ -1445,7 +1445,7 @@ return;
 
 editingId = id;
 salaryDate.value = record.date;
-salaryNote.value = record.note | | "";
+salaryNote.value = record.note || "";
 
 incomeItems.innerHTML = "";
 deductionItems.innerHTML = "";
@@ -1508,7 +1508,7 @@ const totalDeduction = deductionData.reduce(
 );
 
 const record = {
-id: editingId | | (
+id: editingId || (
 crypto.randomUUID
 ? crypto.randomUUID()
 : String(Date.now())
