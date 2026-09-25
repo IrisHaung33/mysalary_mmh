@@ -719,7 +719,8 @@ const netTotal = document.querySelector("#netTotal");
 function loadRecords() {
 try {
 const data = JSON.parse(
-localStorage.getItem(STORAGE_KEY) || "[]"
+const savedData = localStorage.getItem(STORAGE_KEY);
+const data = savedData ? JSON.parse(savedData) : [];
 );
 
 return Array.isArray(data) ? data : [];
