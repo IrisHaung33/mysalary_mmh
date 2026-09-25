@@ -1477,6 +1477,7 @@ records = records.filter(record => record.id !== id);
 saveRecords();
 renderRecords();
 renderHome();
+fillStatisticsYears();
 }
 
 function saveCurrentRecord() {
@@ -1539,6 +1540,7 @@ saveRecords();
 resetForm();
 renderHome();
 renderRecords();
+fillStatisticsYears();
 showPage("recordsPage");
 
 alert("薪資紀錄已儲存。");
@@ -1638,6 +1640,14 @@ document.querySelectorAll(".bottom-nav button")
 button.addEventListener("click", () => {
 showPage(button.dataset.page);
 });
+});
+
+statisticsYear.addEventListener("change", () => {
+renderStatistics();
+});
+
+statisticsType.addEventListener("change", () => {
+renderStatistics();
 });
 
 /* 首頁快速操作 */
@@ -1745,6 +1755,7 @@ records = importedRecords;
 saveRecords();
 renderHome();
 renderRecords();
+fillStatisticsYears();
 
 alert(
 `已還原 ${records.length} 筆薪資紀錄。`
@@ -1783,6 +1794,7 @@ records = [];
 saveRecords();
 renderHome();
 renderRecords();
+fillStatisticsYears();
 resetForm();
 
 alert("所有資料已清除。");
