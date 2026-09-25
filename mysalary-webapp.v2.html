@@ -607,6 +607,51 @@ $0
 </section>
 </main>
 
+<!-- 統計頁 -->
+<main id="statisticsPage" class="page">
+<section class="card">
+<h2>薪資統計</h2>
+
+<div class="grid">
+<div>
+<label for="statisticsYear">查看年份</label>
+<select id="statisticsYear">
+<option value="all">全部年份</option>
+</select>
+</div>
+
+<div>
+<label for="statisticsType">圖表類型</label>
+<select id="statisticsType">
+<option value="line">折線圖</option>
+<option value="bar">長條圖</option>
+</select>
+</div>
+</div>
+
+<div class="summary-grid" style="margin-top: 18px;">
+<div class="summary income">
+<div class="summary-title">期間總收入</div>
+<div id="statisticsIncome" class="summary-value positive">$0</div>
+</div>
+
+<div class="summary deduction">
+<div class="summary-title">期間總扣款</div>
+<div id="statisticsDeduction" class="summary-value negative">$0</div>
+</div>
+
+<div class="summary">
+<div class="summary-title">期間總實領</div>
+<div id="statisticsNet" class="summary-value">$0</div>
+</div>
+</div>
+
+<div style="position: relative; height: 380px;">
+<canvas id="salaryChart"></canvas>
+</div>
+</section>
+</main>
+
 <!-- 設定頁 -->
 <main id="settingsPage" class="page">
 <section class="card">
