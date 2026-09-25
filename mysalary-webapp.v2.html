@@ -1265,7 +1265,172 @@ deleteRecord(button.dataset.id);
 });
 }
 
+function getRecordYear(record) {
+return String(record.date | | "").slice(0, 4);
+}
 
+function fillStatisticsYears() {
+const currentValue = statisticsYear.value;
+
+const years = [...new Set(
+records
+.map(record => getRecordYear(record))
+.filter(year => /^\d{4}$/.test(year))
+)].sort().reverse();
+
+statisticsYear.innerHTML = `
+<option value="all">全部年份</option>
+${years.map(year => `
+<option value="\({year}">\){year} 年</option>
+`).join("")}
+`;
+
+if (
+currentValue === "all" | |
+years.includes(currentValue)
+) {
+statisticsYear.value = currentValue | | "all";
+} else {
+statisticsYear.value = "all";
+}
+}
+
+function getStatisticsRecords() {
+const selectedYear = statisticsYear.value;
+
+if (selectedYear === "all") {
+return records;
+}
+
+return records.filter(record =>
+getRecordYear(record) === selectedYear
+);
+}
+
+function createMonthlyStatistics() {
+const monthlyData = Array.from(
+{ length: 12 },
+(_, index) => ({
+income: 0,
+deduction: 0,
+net: 0,
+month: index + 1
+})
+);
+
+getStatisticsRecords().forEach(record => {
+const month = Number(
+String(record.date | | "").slice(5, 7)
+);
+
+if (month < 1 | | month > 12) {
+return;
+}
+
+const index = month - 1;
+const income = Number(record.incomeTotal) | | 0;
+const deduction = Number(record.deductionTotal) | | 0;
+
+monthlyData[index].income += income;
+monthlyData[index].deduction += deduction;
+monthlyData[index].net += income - deduction;
+});
+
+return monthlyData;
+}
+
+function renderStatistics() {
+if (!statisticsYear | | !salaryChartCanvas) {
+return;
+}
+
+fillStatisticsYears();
+
+const monthlyData = createMonthlyStatistics();
+
+const totalIncome = monthlyData.reduce(
+(sum, item) => sum + item.income,
+0
+);
+
+const totalDeduction = monthlyData.reduce(
+(sum, item) => sum + item.deduction,
+0
+);
+
+const totalNet = totalIncome - totalDeduction;
+
+statisticsIncome.textContent = money(totalIncome);
+statisticsDeduction.textContent = money(totalDeduction);
+statisticsNet.textContent = money(totalNet);
+
+if (salaryChart) {
+salaryChart.destroy();
+}
+
+salaryChart = new Chart(salaryChartCanvas, {
+type: statisticsType.value | | "line",
+data: {
+labels: monthlyData.map(item => `${item.month} 月`),
+datasets: [
+{
+label: "收入",
+data: monthlyData.map(item => item.income),
+borderColor: "#15803d",
+backgroundColor: "rgba(21, 128, 61, 0.25)",
+borderWidth: 3,
+tension: 0.3,
+fill: false
+},
+{
+label: "扣款",
+data: monthlyData.map(item => item.deduction),
+borderColor: "#dc2626",
+backgroundColor: "rgba(220, 38, 38, 0.25)",
+borderWidth: 3,
+tension: 0.3,
+fill: false
+},
+{
+label: "實領",
+data: monthlyData.map(item => item.net),
+borderColor: "#2563eb",
+backgroundColor: "rgba(37, 99, 235, 0.25)",
+borderWidth: 3,
+tension: 0.3,
+fill: false
+}
+]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+interaction: {
+mode: "index",
+intersect: false
+},
+plugins: {
+tooltip: {
+callbacks: {
+label: context =>
+`\({context.dataset.label}：\){money(context.raw)}`
+}
+},
+legend: {
+position: "top"
+}
+},
+scales: {
+y: {
+beginAtZero: true,
+ticks: {
+callback: value => money(value)
+}
+}
+}
+}
+});
+}
 
 function editRecord(id) {
 const record = records.find(item => item.id === id);
