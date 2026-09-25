@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<title>薪資紀錄 App</title>
+
+<style>
+:root {
+--blue: #2563eb;
+--blue-dark: #1d4ed8;
+--green: #15803d;
+--red: #dc2626;
+--orange: #ea580c;
+--text: #1f2937;
+--muted: #6b7280;
+--border: #d1d5db;
+--bg: #f3f4f6;
+--card: #ffffff;
+box-sizing: border-box;
+padding-top: env(safe-area-inset-top, 0px);
+padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+box-sizing: border-box;
+}
+
+html {
+scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) {
+--text: #f3f4f6;
+--muted: #9ca3af;
+--border: #374151;
+--bg: #111827;
+--card: #1f2937;
+}
+}
+
+:root[data-theme="dark"] {
+--text: #f3f4f6;
+--muted: #9ca3af;
+--border: #374151;
+--bg: #111827;
+--card: #1f2937;
+}
+
+body {
+margin: 0;
+padding-bottom: 82px;
+background: var(--bg);
+color: var(--text);
+font-family:
+-apple-system,
+BlinkMacSystemFont,
+"Segoe UI",
+"Noto Sans TC",
+sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+font: inherit;
+}
+
+button {
+border: 0;
+border-radius: 9px;
+padding: 10px 15px;
+background: var(--blue);
+color: #fff;
+cursor: pointer;
+font-weight: 700;
+}
+
+button:hover {
+background: var(--blue-dark);
+}
+
+button.secondary {
+background: #6b7280;
+}
+
+button.green {
+background: var(--green);
+}
+
+button.red {
+background: var(--red);
+}
+
+button.orange {
+background: var(--orange);
+}
+
+button.small {
+padding: 7px 10px;
+font-size: 13px;
+}
+
+.app {
+width: min(1050px, calc(100% - 28px));
+margin: 0 auto;
+}
+
+.app-header {
+padding: 24px 0 18px;
+}
+
+.app-header h1 {
+margin: 0;
+font-size: 27px;
+}
+
+.app-header p {
+margin: 6px 0 0;
+color: var(--muted);
+}
+
+.page {
+display: none;
+animation: fadeIn .2s ease;
+}
+
+.page.active {
+display: block;
+}
+
+@keyframes fadeIn {
+from {
+opacity: 0;
+transform: translateY(4px);
+}
+
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+.card {
+margin-bottom: 16px;
+padding: 18px;
+border-radius: 15px;
+background: var(--card);
+box-shadow: 0 3px 12px rgba(0, 0, 0, .07);
+}
+
+.card h2 {
+margin: 0 0 15px;
+font-size: 19px;
+}
+
+.card h3 {
+margin: 22px 0 10px;
+font-size: 16px;
+}
+
+.grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 14px;
+}
+
+.summary-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 12px;
+margin-bottom: 16px;
+}
+
+.summary {
+padding: 16px;
+border-radius: 12px;
+background: #eff6ff;
+}
+
+:root[data-theme="dark"] .summary,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .summary {
+    background: #1e3a5f;
+  }
+}
+
+.summary.income {
+background: #f0fdf4;
+}
+
+.summary.deduction {
+background: #fef2f2;
+}
+
+.summary-title {
+color: var(--muted);
+font-size: 14px;
+}
+
+.summary-value {
+margin-top: 5px;
+font-size: 23px;
+font-weight: 800;
+word-break: break-word;
+}
+
+.positive {
+color: var(--green);
+}
+
+.negative {
+color: var(--red);
+}
+
+label {
+display: block;
+margin-bottom: 6px;
+font-weight: 700;
+}
+
+input,
+textarea,
+select {
+width: 100%;
+padding: 10px 11px;
+border: 1px solid var(--border);
+border-radius: 8px;
+background: var(--card);
+color: var(--text);
+}
+
+textarea {
+min-height: 180px;
+resize: vertical;
+line-height: 1.6;
+}
+
+.button-row {
+display: flex;
+flex-wrap: wrap;
+gap: 9px;
+margin-top: 14px;
+}
+
+.help {
+color: var(--muted);
+font-size: 14px;
+line-height: 1.6;
+}
+
+.item-header,
+.item-row {
+display: grid;
+grid-template-columns: minmax(130px, 1fr) 150px minmax(100px, .8fr) 40px;
+gap: 8px;
+align-items: center;
+}
+
+.item-header {
+margin-bottom: 7px;
+color: var(--muted);
+font-size: 13px;
+font-weight: 700;
+}
+
+.item-row {
+margin-bottom: 8px;
+}
+
+.item-row button {
+width: 40px;
+height: 40px;
+padding: 0;
+background: var(--red);
+font-size: 20px;
+}
+
+.result {
+margin-top: 15px;
+}
+
+.preview-table,
+.records-table {
+width: 100%;
+border-collapse: collapse;
+}
+
+.preview-table th,
+.preview-table td,
+.records-table th,
+.records-table td {
+padding: 9px 7px;
+border-bottom: 1px solid var(--border);
+text-align: left;
+white-space: nowrap;
+}
+
+.preview-table th,
+.records-table th {
+background: var(--bg);
+}
+
+.records-wrapper {
+overflow-x: auto;
+}
+
+.record-card {
+margin-bottom: 10px;
+padding: 14px;
+border: 1px solid var(--border);
+border-radius: 11px;
+background: var(--card);
+}
+
+.record-top {
+display: flex;
+justify-content: space-between;
+gap: 10px;
+align-items: center;
+}
+
+.record-date {
+font-weight: 800;
+}
+
+.record-net {
+color: var(--blue);
+font-size: 20px;
+font-weight: 800;
+}
+
+.record-info {
+display: flex;
+flex-wrap: wrap;
+gap: 12px;
+margin-top: 8px;
+color: var(--muted);
+font-size: 14px;
+}
+
+.record-actions {
+display: flex;
+flex-wrap: wrap;
+gap: 7px;
+margin-top: 12px;
+}
+
+.empty {
+padding: 24px;
+color: var(--muted);
+text-align: center;
+}
+
+/* 底部 App 導覽列 */
+.bottom-nav {
+position: fixed;
+right: 0;
+bottom: 0;
+left: 0;
+z-index: 1000;
+display: flex;
+justify-content: center;
+padding: 7px 6px calc(7px + env(safe-area-inset-bottom, 0px));
+border-top: 1px solid var(--border);
+background: var(--card);
+box-shadow: 0 -3px 14px rgba(0, 0, 0, .1);
+}
+
+.nav-inner {
+display: flex;
+width: min(700px, 100%);
+}
+
+.bottom-nav button {
+display: flex;
+min-height: 58px;
+flex: 1;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 2px;
+padding: 5px 3px;
+border-radius: 10px;
+background: transparent;
+color: var(--muted);
+font-size: 12px;
+}
+
+.bottom-nav button:hover {
+background: var(--bg);
+color: var(--blue);
+}
+
+.bottom-nav button.active {
+background: #eff6ff;
+color: var(--blue);
+}
+
+.nav-icon {
+font-size: 22px;
+line-height: 1;
+}
+
+@media (max-width: 700px) {
+.app {
+width: min(100% - 20px, 600px);
+}
+
+.app-header {
+padding-top: 18px;
+}
+
+.grid,
+.summary-grid {
+grid-template-columns: 1fr;
+}
+
+.item-header {
+display: none;
+}
+
+.item-row {
+grid-template-columns: 1fr 115px 40px;
+}
+
+.item-row .item-note {
+grid-column: 1 / 3;
+}
+
+.item-row button {
+grid-column: 3;
+grid-row: 1;
+}
+
+.preview-table,
+.records-table {
+font-size: 13px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<script>
+window.addEventListener("error", function (event) {
+alert(
+"程式發生錯誤：\n\n" +
+event.message +
+"\n\n第 " +
+event.lineno +
+" 行"
+);
+});
+
+window.addEventListener("unhandledrejection", function (event) {
+alert(
+"非同步程式錯誤：\n\n" +
+String(event.reason)
+);
+});
+</script>
+
+<div class="app">
+<header class="app-header">
+<h1>薪資紀錄</h1>
+<p id="pageSubtitle">查看薪資統計與最近紀錄</p>
+</header>
+
+<!-- 首頁 -->
+<main id="homePage" class="page active">
+<section class="summary-grid">
+<div class="summary">
+<div class="summary-title">總實領金額</div>
+<div id="homeNet" class="summary-value">$0</div>
+</div>
+
+<div class="summary income">
+<div class="summary-title">總收入</div>
+<div id="homeIncome" class="summary-value positive">
+$0
+</div>
+</div>
+
+<div class="summary deduction">
+<div class="summary-title">總扣款</div>
+<div id="homeDeduction" class="summary-value negative">
+$0
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>最近薪資紀錄</h2>
+<div id="homeRecords"></div>
+</section>
+
+<section class="card">
+<h2>快速操作</h2>
+
+<div class="button-row">
+<button id="goImportButton">匯入薪資</button>
+<button id="goEditButton" class="green">手動新增</button>
+<button id="goRecordsButton" class="secondary">
+查看全部紀錄
+</button>
+</div>
+</section>
+</main>
+
+<!-- 匯入頁 -->
+<main id="importPage" class="page">
+<section class="card">
+<h2>匯入 TXT 薪資資料</h2>
+
+<label for="txtFile">選擇 TXT 檔案</label>
+<input id="txtFile" type="file" accept=".txt,text/plain">
+
+<p class="help">
+可以直接將薪資文字貼到下方。
+</p>
+
+<textarea
+id="rawText"
+placeholder="例如：
+薪給 59052
+夜班津貼 14400
+加班費 2000
+勞保費 1145
+健保費 1428
+所得稅 500"
+></textarea>
+
+<div class="button-row">
+<button id="parseButton">解析薪資資料</button>
+<button id="clearTextButton" class="secondary">
+清除文字
+</button>
+</div>
+
+<div id="parseResult" class="result"></div>
+</section>
+</main>
+
+<!-- 編輯頁 -->
+<main id="editPage" class="page">
+<section class="card">
+<h2 id="editTitle">新增薪資紀錄</h2>
+
+<div class="grid">
+<div>
+<label for="salaryDate">薪資日期</label>
+<input id="salaryDate" type="date">
+</div>
+
+<div>
+<label for="salaryNote">紀錄備註</label>
+<input
+id="salaryNote"
+type="text"
+placeholder="例如：2026 年 1 月薪資"
+>
+</div>
+</div>
+
+<h3>收入項目</h3>
+
+<div class="item-header">
+<span>項目名稱</span>
+<span>金額</span>
+<span>備註</span>
+<span></span>
+</div>
+
+<div id="incomeItems"></div>
+
+<button id="addIncomeButton" class="small">
+＋ 新增收入
+</button>
+
+<h3>扣款項目</h3>
+
+<div class="item-header">
+<span>項目名稱</span>
+<span>金額</span>
+<span>備註</span>
+<span></span>
+</div>
+
+<div id="deductionItems"></div>
+
+<button id="addDeductionButton" class="small">
+＋ 新增扣款
+</button>
+
+<div class="summary-grid" style="margin-top: 22px;">
+<div class="summary income">
+<div class="summary-title">收入合計</div>
+<div id="incomeTotal" class="summary-value positive">
+$0
+</div>
+</div>
+
+<div class="summary deduction">
+<div class="summary-title">扣款合計</div>
+<div id="deductionTotal" class="summary-value negative">
+$0
+</div>
+</div>
+
+<div class="summary">
+<div class="summary-title">實領金額</div>
+<div id="netTotal" class="summary-value">$0</div>
+</div>
+</div>
+
+<div class="button-row">
+<button id="saveButton" class="green">
+儲存薪資紀錄
+</button>
+
+<button id="resetFormButton" class="secondary">
+清空表單
+</button>
+</div>
+</section>
+</main>
+
+<!-- 紀錄頁 -->
+<main id="recordsPage" class="page">
+<section class="card">
+<h2>歷史薪資紀錄</h2>
+<div id="recordsContainer"></div>
+</section>
+</main>
+
+<!-- 統計頁 -->
+<main id="statisticsPage" class="page">
+<section class="card">
+<h2>薪資統計</h2>
+
+<div class="grid">
+<div>
+<label for="statisticsYear">查看年份</label>
+<select id="statisticsYear">
+<option value="all">全部年份</option>
+</select>
+</div>
+
+<div>
+<label for="statisticsType">圖表類型</label>
+<select id="statisticsType">
+<option value="line">折線圖</option>
+<option value="bar">長條圖</option>
+</select>
+</div>
+</div>
+
+<div class="summary-grid" style="margin-top: 18px;">
+<div class="summary income">
+<div class="summary-title">期間總收入</div>
+<div id="statisticsIncome" class="summary-value positive">$0</div>
+</div>
+
+<div class="summary deduction">
+<div class="summary-title">期間總扣款</div>
+<div id="statisticsDeduction" class="summary-value negative">$0</div>
+</div>
+
+<div class="summary">
+<div class="summary-title">期間總實領</div>
+<div id="statisticsNet" class="summary-value">$0</div>
+</div>
+</div>
+
+<div style="position: relative; height: 380px;">
+<canvas id="salaryChart"></canvas>
+</div>
+</section>
+</main>
+
+<!-- 設定頁 -->
+<main id="settingsPage" class="page">
+<section class="card">
+<h2>資料備份</h2>
+
+<p class="help">
+JSON 可完整備份與還原資料；CSV 適合用 Excel 或試算表開啟。
+</p>
+
+<div class="button-row">
+<button id="exportJsonButton" class="green">
+匯出 JSON 備份
+</button>
+
+<button id="exportCsvButton">
+匯出 CSV 報表
+</button>
+</div>
+</section>
+
+<section class="card">
+<h2>還原資料</h2>
+
+<label for="jsonFile">選擇 JSON 備份檔</label>
+<input id="jsonFile" type="file" accept=".json,application/json">
+</section>
+
+<section class="card">
+<h2>危險操作</h2>
+
+<p class="help">
+清除後無法復原。建議先匯出 JSON 備份。
+</p>
+
+<button id="clearAllButton" class="red">
+清除所有資料
+</button>
+</section>
+
+<section class="card">
+<h2>關於</h2>
+
+<p class="help">
+此 App 的資料只儲存在目前瀏覽器的本機儲存空間，
+不會自動上傳到網路。
+</p>
+</section>
+</main>
+</div>
+
+<!-- 底部導覽列 -->
+<nav class="bottom-nav">
+<div class="nav-inner">
+<button class="active" data-page="homePage">
+<span class="nav-icon">🏠</span>
+<span>首頁</span>
+</button>
+
+<button data-page="importPage">
+<span class="nav-icon">📥</span>
+<span>匯入</span>
+</button>
+
+<button data-page="editPage">
+<span class="nav-icon">✏</span>
+<span>編輯</span>
+</button>
+
+<button data-page="recordsPage">
+<span class="nav-icon">📋</span>
+<span>紀錄</span>
+</button>
+
+<button data-page="statisticsPage">
+<span class="nav-icon">📈</span>
+<span>統計</span>
+</button>
+
+<button data-page="settingsPage">
+<span class="nav-icon">⚙</span>
+<span>設定</span>
+</button>
+</div>
+</nav>
+
+<script>
+const STORAGE_KEY = "salaryRecordsV2";
+
+let records = loadRecords();
+let editingId = null;
+
+const pageTitles = {
+homePage: "查看薪資統計與最近紀錄",
+importPage: "匯入並解析薪資文字",
+editPage: "修改薪資項目與金額",
+recordsPage: "查看所有歷史薪資",
+statisticsPage: "查看全年與歷年薪資統計",
+settingsPage: "備份與管理資料"
+};
+
+const pageSubtitle = document.querySelector("#pageSubtitle");
+const rawText = document.querySelector("#rawText");
+const txtFile = document.querySelector("#txtFile");
+const jsonFile = document.querySelector("#jsonFile");
+const parseResult = document.querySelector("#parseResult");
+
+const incomeItems = document.querySelector("#incomeItems");
+const deductionItems = document.querySelector("#deductionItems");
+
+const salaryDate = document.querySelector("#salaryDate");
+const salaryNote = document.querySelector("#salaryNote");
+
+const incomeTotal = document.querySelector("#incomeTotal");
+const deductionTotal = document.querySelector("#deductionTotal");
+const netTotal = document.querySelector("#netTotal");
+
+const statisticsYear =
+document.querySelector("#statisticsYear");
+
+const statisticsType =
+document.querySelector("#statisticsType");
+
+const statisticsIncome =
+document.querySelector("#statisticsIncome");
+
+const statisticsDeduction =
+document.querySelector("#statisticsDeduction");
+
+const statisticsNet =
+document.querySelector("#statisticsNet");
+
+const salaryChartCanvas =
+document.querySelector("#salaryChart");
+
+let salaryChart = null;
+
+function loadRecords() {
+try {
+const savedData = localStorage.getItem(STORAGE_KEY);
+
+if (!savedData) {
+return [];
+}
+
+const data = JSON.parse(savedData);
+
+if (!Array.isArray(data)) {
+return [];
+}
+
+return data;
+} catch (error) {
+return [];
+}
+}
+
+function saveRecords() {
+try {
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(records)
+);
+} catch (error) {
+alert("資料儲存失敗，可能是瀏覽器儲存空間已滿。");
+}
+}
+
+function money(value) {
+const number = Math.round(Number(value) || 0);
+
+return new Intl.NumberFormat("zh-TW", {
+style: "currency",
+currency: "TWD",
+maximumFractionDigits: 0
+}).format(number);
+}
+
+function escapeHtml(value) {
+return String(value ?? "")
+.replaceAll("&", "&amp;")
+.replaceAll("<", "&lt;")
+.replaceAll(">", "&gt;")
+.replaceAll('"', "&quot;")
+.replaceAll("'", "&#039;");
+}
+
+function parseAmount(value) {
+const number = Number(
+String(value ?? "")
+.replace(/[,\s，元$]/g, "")
+);
+
+return Number.isFinite(number)
+? Math.abs(number)
+: 0;
+}
+
+function isDeduction(line) {
+const keywords = [
+"扣款",
+"扣除",
+"勞保",
+"健保",
+"所得稅",
+"稅",
+"福利金",
+"工會費",
+"請假扣薪",
+"代扣"
+];
+
+return keywords.some(keyword =>
+line.includes(keyword)
+);
+}
+
+function parseSalaryText(text) {
+const lines = String(text)
+.replace(/\u00a0/g, " ")
+.replace(/\r\n/g, "\n")
+.replace(/\r/g, "\n")
+.split("\n")
+.map(line => line.trim())
+.filter(Boolean);
+
+const result = [];
+
+for (const line of lines) {
+const matches = line.match(
+/[-+]?\d[\d,，]*(?:\.\d+)?/g
+);
+
+if (!matches) {
+continue;
+}
+
+const lastNumber = matches[matches.length - 1];
+const amount = parseAmount(lastNumber);
+
+const name = line
+.slice(0, line.lastIndexOf(lastNumber))
+.replace(/[：: | ｜]/g, " ")
+.trim();
+
+if (!name) {
+continue;
+}
+
+result.push({
+name,
+amount,
+type: isDeduction(line)
+? "deduction"
+: "income"
+});
+}
+
+return result;
+}
+
+function createItemRow(type, item = {}) {
+const row = document.createElement("div");
+row.className = "item-row";
+
+row.innerHTML = `
+<input
+class="item-name"
+type="text"
+placeholder="項目名稱"
+value="${escapeHtml(item.name || "")}"
+>
+
+<input
+class="item-amount"
+type="number"
+min="0"
+step="1"
+placeholder="金額"
+value="${item.amount || item.amount === 0 ? item.amount : ""}"
+>
+
+<input
+class="item-note"
+type="text"
+placeholder="備註"
+value="${escapeHtml(item.note || "")}"
+>
+
+<button
+type="button"
+class="remove-item"
+title="刪除項目"
+>×</button>
+`;
+
+row.querySelectorAll("input").forEach(input => {
+input.addEventListener("input", updateTotals);
+});
+
+row.querySelector(".remove-item")
+.addEventListener("click", () => {
+row.remove();
+updateTotals();
+});
+
+if (type === "income") {
+incomeItems.appendChild(row);
+} else {
+deductionItems.appendChild(row);
+}
+
+updateTotals();
+}
+
+function getItems(container) {
+return [...container.querySelectorAll(".item-row")]
+.map(row => ({
+name: row.querySelector(".item-name")
+.value.trim(),
+
+amount: parseAmount(
+row.querySelector(".item-amount").value
+),
+
+note: row.querySelector(".item-note")
+.value.trim()
+}))
+.filter(item => item.name || item.amount);
+}
+
+function updateTotals() {
+const incomes = getItems(incomeItems);
+const deductions = getItems(deductionItems);
+
+const incomeSum = incomes.reduce(
+(sum, item) => sum + item.amount,
+0
+);
+
+const deductionSum = deductions.reduce(
+(sum, item) => sum + item.amount,
+0
+);
+
+incomeTotal.textContent = money(incomeSum);
+deductionTotal.textContent = money(deductionSum);
+netTotal.textContent = money(
+incomeSum - deductionSum
+);
+}
+
+function resetForm() {
+editingId = null;
+
+salaryDate.value = new Date()
+.toISOString()
+.slice(0, 10);
+
+salaryNote.value = "";
+incomeItems.innerHTML = "";
+deductionItems.innerHTML = "";
+
+createItemRow("income");
+createItemRow("deduction");
+
+document.querySelector("#editTitle")
+.textContent = "新增薪資紀錄";
+
+document.querySelector("#saveButton")
+.textContent = "儲存薪資紀錄";
+
+updateTotals();
+}
+
+function showPage(pageId) {
+const pages = document.querySelectorAll(".page");
+
+pages.forEach(page => {
+page.classList.remove("active");
+});
+
+const targetPage = document.getElementById(pageId);
+
+if (targetPage) {
+targetPage.classList.add("active");
+}
+
+document.querySelectorAll(".bottom-nav button").forEach(button => {
+button.classList.toggle(
+"active",
+button.dataset.page === pageId
+);
+});
+
+if (pageSubtitle) {
+pageSubtitle.textContent =
+pageTitles[pageId] || "薪資管理";
+}
+
+if (pageId === "homePage") {
+renderHome();
+}
+
+if (pageId === "recordsPage") {
+renderRecords();
+}
+
+if (pageId === "statisticsPage") {
+renderStatistics();
+}
+}
+
+function showParsedItems(items) {
+if (!items.length) {
+parseResult.innerHTML = `
+<p class="help">
+找不到可辨識的薪資項目，請確認每一行最後有金額。
+</p>
+`;
+return;
+}
+
+parseResult.innerHTML = `
+<h3>解析預覽</h3>
+
+<div class="records-wrapper">
+<table class="preview-table">
+<thead>
+<tr>
+<th>類型</th>
+<th>項目</th>
+<th>金額</th>
+</tr>
+</thead>
+
+<tbody>
+${items.map(item => `
+<tr>
+<td>
+${item.type === "income" ? "收入" : "扣款"}
+</td>
+
+<td>${escapeHtml(item.name)}</td>
+
+<td class="${
+item.type === "income"
+? "positive"
+: "negative"
+}">
+${item.type === "income" ? "" : "-"}
+${money(item.amount)}
+</td>
+</tr>
+`).join("")}
+</tbody>
+</table>
+</div>
+
+<div class="button-row">
+<button id="applyParsedButton" class="green">
+套用到編輯頁
+</button>
+</div>
+`;
+
+document.querySelector("#applyParsedButton")
+.addEventListener("click", () => {
+incomeItems.innerHTML = "";
+deductionItems.innerHTML = "";
+
+items.forEach(item => {
+createItemRow(item.type, item);
+});
+});
+
+updateTotals();
+showPage("editPage");
+}
+
+function getSortedRecords() {
+return [...records].sort((a, b) =>
+String(b.date).localeCompare(String(a.date))
+);
+}
+
+function renderHome() {
+const totalIncome = records.reduce(
+(sum, record) => sum + Number(record.incomeTotal || 0),
+0
+);
+
+const totalDeduction = records.reduce(
+(sum, record) =>
+sum + Number(record.deductionTotal || 0),
+0
+);
+
+document.querySelector("#homeIncome")
+.textContent = money(totalIncome);
+
+document.querySelector("#homeDeduction")
+.textContent = money(totalDeduction);
+
+document.querySelector("#homeNet")
+.textContent = money(
+totalIncome - totalDeduction
+);
+
+const recent = getSortedRecords().slice(0, 5);
+const container = document.querySelector("#homeRecords");
+
+if (!recent.length) {
+container.innerHTML = `
+<div class="empty">
+尚未有薪資紀錄。
+</div>
+`;
+return;
+}
+
+container.innerHTML = recent.map(record => `
+<div class="record-card">
+<div class="record-top">
+<div class="record-date">
+${escapeHtml(record.date)}
+</div>
+
+<div class="record-net">
+${money(record.netTotal)}
+</div>
+</div>
+
+<div class="record-info">
+<span class="positive">
+收入 ${money(record.incomeTotal)}
+</span>
+
+<span class="negative">
+扣款 ${money(record.deductionTotal)}
+</span>
+
+<span>
+${escapeHtml(record.note || "")}
+</span>
+</div>
+</div>
+`).join("");
+}
+
+function renderRecords() {
+const container =
+document.querySelector("#recordsContainer");
+
+if (!records.length) {
+container.innerHTML = `
+<div class="empty">
+尚未儲存任何薪資紀錄。
+</div>
+`;
+return;
+}
+
+container.innerHTML = getSortedRecords()
+.map(record => `
+<div class="record-card">
+<div class="record-top">
+<div class="record-date">
+${escapeHtml(record.date)}
+</div>
+
+<div class="record-net">
+${money(record.netTotal)}
+</div>
+</div>
+
+<div class="record-info">
+<span class="positive">
+收入 ${money(record.incomeTotal)}
+</span>
+
+<span class="negative">
+扣款 ${money(record.deductionTotal)}
+</span>
+
+<span>
+${escapeHtml(record.note || "")}
+</span>
+</div>
+
+<div class="record-actions">
+<button
+class="small edit-record"
+data-id="${record.id}"
+>
+編輯
+</button>
+
+<button
+class="small red delete-record"
+data-id="${record.id}"
+>
+刪除
+</button>
+</div>
+</div>
+`)
+.join("");
+
+container.querySelectorAll(".edit-record")
+.forEach(button => {
+button.addEventListener("click", () => {
+editRecord(button.dataset.id);
+});
+});
+
+container.querySelectorAll(".delete-record")
+.forEach(button => {
+button.addEventListener("click", () => {
+deleteRecord(button.dataset.id);
+});
+});
+}
+
+function getRecordYear(record) {
+return String(record.date || "").slice(0, 4);
+}
+
+function fillStatisticsYears() {
+const currentValue = statisticsYear.value;
+
+const years = [...new Set(
+records
+.map(record => getRecordYear(record))
+.filter(year => /^\d{4}$/.test(year))
+)].sort().reverse();
+
+statisticsYear.innerHTML = `
+<option value="all">全部年份</option>
+${years.map(year => `
+<option value="${year}">${year} 年</option>
+`).join("")}
+`;
+
+if (
+currentValue === "all" ||
+years.includes(currentValue)
+) {
+statisticsYear.value = currentValue || "all";
+} else {
+statisticsYear.value = "all";
+}
+}
+
+function getStatisticsRecords() {
+const selectedYear = statisticsYear.value;
+
+if (selectedYear === "all") {
+return records;
+}
+
+return records.filter(record =>
+getRecordYear(record) === selectedYear
+);
+}
+
+function createMonthlyStatistics() {
+const monthlyData = Array.from(
+{ length: 12 },
+(_, index) => ({
+income: 0,
+deduction: 0,
+net: 0,
+month: index + 1
+})
+);
+
+getStatisticsRecords().forEach(record => {
+const month = Number(
+String(record.date || "").slice(5, 7)
+);
+
+if (month < 1 || month > 12) {
+return;
+}
+
+const index = month - 1;
+const income = Number(record.incomeTotal) || 0;
+const deduction = Number(record.deductionTotal) || 0;
+
+monthlyData[index].income += income;
+monthlyData[index].deduction += deduction;
+monthlyData[index].net += income - deduction;
+});
+
+return monthlyData;
+}
+
+function renderStatistics() {
+if (!statisticsYear || !salaryChartCanvas || typeof Chart === "undefined") {
+return;
+}
+
+fillStatisticsYears();
+
+const monthlyData = createMonthlyStatistics();
+
+const totalIncome = monthlyData.reduce(
+(sum, item) => sum + item.income,
+0
+);
+
+const totalDeduction = monthlyData.reduce(
+(sum, item) => sum + item.deduction,
+0
+);
+
+const totalNet = totalIncome - totalDeduction;
+
+statisticsIncome.textContent = money(totalIncome);
+statisticsDeduction.textContent = money(totalDeduction);
+statisticsNet.textContent = money(totalNet);
+
+if (salaryChart) {
+salaryChart.destroy();
+}
+
+salaryChart = new Chart(salaryChartCanvas, {
+type: statisticsType.value || "line",
+data: {
+labels: monthlyData.map(item => `${item.month} 月`),
+datasets: [
+{
+label: "收入",
+data: monthlyData.map(item => item.income),
+borderColor: "#15803d",
+backgroundColor: "rgba(21, 128, 61, 0.25)",
+borderWidth: 3,
+tension: 0.3,
+fill: false
+},
+{
+label: "扣款",
+data: monthlyData.map(item => item.deduction),
+borderColor: "#dc2626",
+backgroundColor: "rgba(220, 38, 38, 0.25)",
+borderWidth: 3,
+tension: 0.3,
+fill: false
+},
+{
+label: "實領",
+data: monthlyData.map(item => item.net),
+borderColor: "#2563eb",
+backgroundColor: "rgba(37, 99, 235, 0.25)",
+borderWidth: 3,
+tension: 0.3,
+fill: false
+}
+]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+interaction: {
+mode: "index",
+intersect: false
+},
+plugins: {
+tooltip: {
+callbacks: {
+label: context =>
+`${context.dataset.label}：${money(context.raw)}`
+}
+},
+legend: {
+position: "top"
+}
+},
+scales: {
+y: {
+beginAtZero: true,
+ticks: {
+callback: value => money(value)
+}
+}
+}
+}
+});
+}
+
+function editRecord(id) {
+const record = records.find(item => item.id === id);
+
+if (!record) {
+return;
+}
+
+editingId = id;
+salaryDate.value = record.date;
+salaryNote.value = record.note || "";
+
+incomeItems.innerHTML = "";
+deductionItems.innerHTML = "";
+
+record.incomeItems.forEach(item => {
+createItemRow("income", item);
+});
+
+record.deductionItems.forEach(item => {
+createItemRow("deduction", item);
+});
+
+document.querySelector("#editTitle")
+.textContent = "編輯薪資紀錄";
+
+document.querySelector("#saveButton")
+.textContent = "更新薪資紀錄";
+
+updateTotals();
+showPage("editPage");
+}
+
+function deleteRecord(id) {
+if (!confirm("確定要刪除這筆薪資紀錄嗎？")) {
+return;
+}
+
+records = records.filter(record => record.id !== id);
+saveRecords();
+renderRecords();
+renderHome();
+fillStatisticsYears();
+}
+
+function saveCurrentRecord() {
+const incomeData = getItems(incomeItems);
+const deductionData = getItems(deductionItems);
+
+if (!salaryDate.value) {
+alert("請先選擇薪資日期。");
+return;
+}
+
+if (
+incomeData.length === 0 &&
+deductionData.length === 0
+) {
+alert("請至少輸入一個收入或扣款項目。");
+return;
+}
+
+const totalIncome = incomeData.reduce(
+(sum, item) => sum + item.amount,
+0
+);
+
+const totalDeduction = deductionData.reduce(
+(sum, item) => sum + item.amount,
+0
+);
+
+const record = {
+id: editingId || (
+crypto.randomUUID
+? crypto.randomUUID()
+: String(Date.now())
+),
+
+date: salaryDate.value,
+note: salaryNote.value.trim(),
+
+incomeItems: incomeData,
+deductionItems: deductionData,
+
+incomeTotal: totalIncome,
+deductionTotal: totalDeduction,
+netTotal: totalIncome - totalDeduction,
+
+rawText: rawText.value,
+updatedAt: new Date().toISOString()
+};
+
+if (editingId) {
+records = records.map(item =>
+item.id === editingId ? record : item
+);
+} else {
+records.push(record);
+}
+
+saveRecords();
+resetForm();
+renderHome();
+renderRecords();
+fillStatisticsYears();
+showPage("recordsPage");
+
+alert("薪資紀錄已儲存。");
+}
+
+function downloadFile(filename, content, type) {
+const blob = new Blob(
+[content],
+{ type: `${type};charset=utf-8` }
+);
+
+const url = URL.createObjectURL(blob);
+const link = document.createElement("a");
+
+link.href = url;
+link.download = filename;
+document.body.appendChild(link);
+link.click();
+link.remove();
+
+setTimeout(() => {
+URL.revokeObjectURL(url);
+}, 500);
+}
+
+function exportJson() {
+const data = {
+version: 2,
+exportedAt: new Date().toISOString(),
+records
+};
+
+downloadFile(
+`salary-backup-${
+new Date().toISOString().slice(0, 10)
+}.json`,
+JSON.stringify(data, null, 2),
+"application/json"
+);
+}
+
+function csvCell(value) {
+const text = String(value ?? "");
+return `"${text.replaceAll('"', '""')}"`;
+}
+
+function exportCsv() {
+const rows = [[
+"日期",
+"類型",
+"項目",
+"金額",
+"項目備註",
+"紀錄備註"
+]];
+
+records.forEach(record => {
+record.incomeItems.forEach(item => {
+rows.push([
+record.date,
+"收入",
+item.name,
+item.amount,
+item.note,
+record.note
+]);
+});
+
+record.deductionItems.forEach(item => {
+rows.push([
+record.date,
+"扣款",
+item.name,
+-item.amount,
+item.note,
+record.note
+]);
+});
+});
+
+const csv = "\uFEFF" + rows
+.map(row => row.map(csvCell).join(","))
+.join("\n");
+
+downloadFile(
+`salary-report-${
+new Date().toISOString().slice(0, 10)
+}.csv`,
+csv,
+"text/csv"
+);
+}
+
+/* 底部導覽切換 */
+document.querySelectorAll(".bottom-nav button")
+.forEach(button => {
+button.addEventListener("click", () => {
+showPage(button.dataset.page);
+});
+});
+
+statisticsYear.addEventListener("change", () => {
+renderStatistics();
+});
+
+statisticsType.addEventListener("change", () => {
+renderStatistics();
+});
+
+/* 首頁快速操作 */
+document.querySelector("#goImportButton")
+.addEventListener("click", () => {
+showPage("importPage");
+});
+
+document.querySelector("#goEditButton")
+.addEventListener("click", () => {
+resetForm();
+showPage("editPage");
+});
+
+document.querySelector("#goRecordsButton")
+.addEventListener("click", () => {
+showPage("recordsPage");
+});
+
+/* TXT 匯入 */
+txtFile.addEventListener("change", event => {
+const file = event.target.files[0];
+
+if (!file) {
+return;
+}
+
+const reader = new FileReader();
+
+reader.onload = event => {
+rawText.value = event.target.result;
+showParsedItems(
+parseSalaryText(rawText.value)
+);
+};
+
+reader.onerror = () => {
+alert("TXT 檔案讀取失敗。");
+};
+
+reader.readAsText(file, "UTF-8");
+});
+
+document.querySelector("#parseButton")
+.addEventListener("click", () => {
+showParsedItems(
+parseSalaryText(rawText.value)
+);
+});
+
+document.querySelector("#clearTextButton")
+.addEventListener("click", () => {
+rawText.value = "";
+parseResult.innerHTML = "";
+txtFile.value = "";
+});
+
+/* 編輯項目 */
+document.querySelector("#addIncomeButton")
+.addEventListener("click", () => {
+createItemRow("income");
+});
+
+document.querySelector("#addDeductionButton")
+.addEventListener("click", () => {
+createItemRow("deduction");
+});
+
+/* 儲存與表單操作 */
+document.querySelector("#saveButton")
+.addEventListener("click", saveCurrentRecord);
+
+document.querySelector("#resetFormButton")
+.addEventListener("click", () => {
+resetForm();
+});
+
+/* JSON 備份與還原 */
+document.querySelector("#exportJsonButton")
+.addEventListener("click", exportJson);
+
+document.querySelector("#exportCsvButton")
+.addEventListener("click", exportCsv);
+
+jsonFile.addEventListener("change", event => {
+const file = event.target.files[0];
+
+if (!file) {
+return;
+}
+
+const reader = new FileReader();
+
+reader.onload = event => {
+try {
+const data = JSON.parse(event.target.result);
+
+const importedRecords = Array.isArray(data)
+? data
+: data.records;
+
+if (!Array.isArray(importedRecords)) {
+throw new Error("JSON 格式錯誤");
+}
+
+records = importedRecords;
+saveRecords();
+renderHome();
+renderRecords();
+fillStatisticsYears();
+
+alert(
+`已還原 ${records.length} 筆薪資紀錄。`
+);
+} catch (error) {
+alert(
+"JSON 匯入失敗，請確認檔案是本 App 匯出的備份檔。"
+);
+}
+};
+
+reader.onerror = () => {
+alert("JSON 檔案讀取失敗。");
+};
+
+reader.readAsText(file, "UTF-8");
+});
+
+/* 清除全部資料 */
+document.querySelector("#clearAllButton")
+.addEventListener("click", () => {
+if (!records.length) {
+alert("目前沒有可清除的資料。");
+return;
+}
+
+const confirmed = confirm(
+"確定要清除所有薪資紀錄嗎？此操作無法復原。"
+);
+
+if (!confirmed) {
+return;
+}
+
+records = [];
+saveRecords();
+renderHome();
+renderRecords();
+fillStatisticsYears();
+resetForm();
+
+alert("所有資料已清除。");
+});
+
+/* 初始畫面 */
+resetForm();
+renderHome();
+renderRecords();
+showPage("homePage");
+</script>
+</body>
+</html>
